@@ -1,26 +1,19 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
-func strStr(haystack string, needle string) int {
-
-	if len(needle) > len(haystack) {
-		return -1
+func reverseString(s string) []string {
+	sr := strings.Split(s, "")
+	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+		sr[i], sr[j] = sr[j], sr[i]
 	}
-
-	for i := 0; i < len(haystack)-len(needle); i++ {
-		for j := 0; haystack[i+j] == needle[j]; j++ {
-			if j == len(needle)-1 {
-				fmt.Println(j)
-				return i
-			}
-		}
-	}
-
-	return -1
+	return sr
 }
 
 func main() {
-	a := strStr("mississippi", "issipi")
-	fmt.Println(a)
+	a := "qweqwe"
+	fmt.Println(a, reverseString(a))
 }
