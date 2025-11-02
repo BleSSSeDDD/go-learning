@@ -1,76 +1,19 @@
 package main
 
-import (
-	"fmt"
-	"sync"
-	"time"
-)
+import "fmt"
 
-func writer() <-chan int {
-	ch := make(chan int)
-	wg := &sync.WaitGroup{}
-	wg.Add(2)
-	go func() {
-		defer wg.Done()
-		for i := 0; i < 5; i++ {
-			fmt.Println("Writer 1 writes i: ", i)
-			ch <- i
+func triangularSum(nums []int) int {
+	for len(nums) > 1 {
+		for i := 0; i < len(nums)-1; i++ {
+			fmt.Println(nums)
+			nums[i] = (nums[i] + nums[i+1]) % 10
 		}
-	}()
-	go func() {
-		defer wg.Done()
-		for i := 0; i > -5; i-- {
-			fmt.Println("Writer 2 writes i: ", i)
-			ch <- i
-		}
-	}()
-	go func() {
-		wg.Wait()
-		close(ch)
-	}()
-
-	return ch
-}
-
-func doubler(ch <-chan int) <-chan int {
-	ch1 := make(chan int)
-	wg := &sync.WaitGroup{}
-	wg.Add(2)
-	go func() {
-		defer wg.Done()
-		count := 0
-		for v := range ch {
-			count++
-			fmt.Printf("Doubler 1 received %d (total: %d)\n", v, count)
-			ch1 <- v * 2
-		}
-		fmt.Printf("Doubler 1 finished, processed %d values\n", count)
-	}()
-	go func() {
-		defer wg.Done()
-		count := 0
-		for v := range ch {
-			count++
-			fmt.Printf("Doubler 2 received %d (total: %d)\n", v, count)
-			ch1 <- v * 2
-		}
-		fmt.Printf("Doubler 2 finished, processed %d values\n", count)
-	}()
-	go func() {
-		wg.Wait()
-		close(ch1)
-	}()
-
-	return ch1
-}
-
-func reader(ch <-chan int) {
-	for i := range ch {
-		fmt.Println("Reader recieves: ", i)
+		nums = nums[:len(nums)-1]
 	}
+	return nums[0]
 }
 
 func main() {
-	reader(doubler(writer()))
-	time.Sleep(2 * time.Second)
+	a := []int{1, 2, 3, 4, 5}
+	fmt.Println(triangularSum(a))
 }
