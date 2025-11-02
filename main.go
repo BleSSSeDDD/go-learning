@@ -1,15 +1,31 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"sync"
+)
 
 func writer() <-chan int {
 	ch := make(chan int)
+	wg := sync.WaitGroup{}
+	wg.Add(2)
 	go func() {
+		defer wg.Done()
 		for i := 0; i < 10; i++ {
 			ch <- i
 		}
+	}()
+	go func() {
+		defer wg.Done()
+		for i := 0; i > -10; i-- {
+			ch <- i
+		}
+	}()
+	go func() {
+		wg.Wait()
 		close(ch)
 	}()
+
 	return ch
 }
 
