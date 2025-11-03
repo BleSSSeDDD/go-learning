@@ -1,19 +1,36 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
-func triangularSum(nums []int) int {
-	for len(nums) > 1 {
-		for i := 0; i < len(nums)-1; i++ {
-			fmt.Println(nums)
-			nums[i] = (nums[i] + nums[i+1]) % 10
-		}
-		nums = nums[:len(nums)-1]
+// Делает посимвольный сплит строки
+// и идет с конца, пока первый символ не будет не пробелом
+// потом начинает считать сколько не пробелов подряд
+// и если появился пробел после того как уже было что-то в результате
+// то возвращает результат
+func lengthOfLastWord(s string) int {
+	sarray := strings.Split(s, "")
+	res := 0
+	if len(sarray) == 1 {
+		return 1
 	}
-	return nums[0]
+	for i := len(sarray) - 1; i >= 0; i-- {
+		if sarray[i] != " " {
+			res++
+			if i == 0 {
+				return res
+			}
+			continue
+		}
+		if res != 0 {
+			return res
+		}
+	}
+	return 0
 }
 
 func main() {
-	a := []int{1, 2, 3, 4, 5}
-	fmt.Println(triangularSum(a))
+	fmt.Println(lengthOfLastWord("a  фыф qwecqd sadasd     "))
 }
