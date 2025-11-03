@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 )
@@ -64,19 +65,34 @@ func isPalindromeFaster(wg *sync.WaitGroup, s string) bool {
 }
 
 func main() {
-	s := "A man, a plan, a canal: Panama"
+	base := "A man, a plan, a canal: Panama"
+	var sb strings.Builder
+	for i := 0; i < 100000; i++ {
+		sb.WriteString(base)
+	}
+	s := sb.String()
+
+	s += "X"
+
+	fmt.Printf("Длина строки: %d символов\n", len(s))
 
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
-	start := time.Now()
+
+	start1 := time.Now()
 	go func() {
-		fmt.Println(isPalindrome(wg, s))
-		fmt.Println(time.Since(start))
+		defer fmt.Printf("Версия 1: %v\n", time.Since(start1))
+		result1 := isPalindrome(wg, s)
+		fmt.Printf("Результат 1: %t\n", result1)
 	}()
+
+	start2 := time.Now()
 	go func() {
-		fmt.Println(isPalindromeFaster(wg, s))
-		fmt.Println(time.Since(start))
+		defer fmt.Printf("Версия 2: %v\n", time.Since(start2))
+		result2 := isPalindromeFaster(wg, s)
+		fmt.Printf("Результат 2: %t\n", result2)
 	}()
+
 	wg.Wait()
 	fmt.Println("Готово!")
 }
