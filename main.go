@@ -2,28 +2,36 @@ package main
 
 import (
 	"fmt"
+	"strings"
 )
 
-// You are given an array prices where prices[i] is the price of a given stock on the ith day.
-//
-// You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock.
-//
-// Return the maximum profit you can achieve from this transaction. If you cannot achieve any profit, return 0.
-func majorityElement(nums []int) int {
-	mapp := make(map[int]int)
-	maxElem, maxCount := nums[0], 0
-	mapp[nums[0]]++
-	for i := 1; i < len(nums); i++ {
-		mapp[nums[i]]++
-		if mapp[nums[i]] > maxCount {
-			maxCount = mapp[nums[i]]
-			maxElem = nums[i]
+// Given two strings s and t, return true if s is a subsequence of t, or false otherwise.
+// A subsequence of a string is a new string that is formed from the original string
+// by deleting some (can be none) of the characters without disturbing the relative positions of the remaining
+// characters. (i.e., "ace" is a subsequence of "abcde" while "aec" is not).
+func isSubsequence(s string, t string) bool {
+	if len(s) > len(t) {
+		return false
+	}
+	if len(s) == 0 {
+		return true
+	}
+	cnt := 0
+	tres := strings.Split(t, "")
+	sres := strings.Split(s, "")
+	for i := 0; i < len(tres); i++ {
+		if sres[cnt] == tres[i] {
+			if cnt == len(sres)-1 {
+				return true
+			}
+			cnt++
 		}
 	}
-	return maxElem
+	return false
 }
 
 func main() {
-	a := []int{3, 3, 4}
-	fmt.Println(majorityElement(a))
+	a := ""
+	b := "a"
+	fmt.Println(isSubsequence(a, b))
 }
