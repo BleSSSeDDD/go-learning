@@ -2,36 +2,81 @@ package main
 
 import (
 	"fmt"
-	"strings"
+	"sync"
+	"time"
 )
 
-// Given two strings s and t, return true if s is a subsequence of t, or false otherwise.
-// A subsequence of a string is a new string that is formed from the original string
-// by deleting some (can be none) of the characters without disturbing the relative positions of the remaining
-// characters. (i.e., "ace" is a subsequence of "abcde" while "aec" is not).
-func isSubsequence(s string, t string) bool {
-	if len(s) > len(t) {
-		return false
-	}
-	if len(s) == 0 {
+func isDigit(s byte) bool {
+	return s >= '0' && s <= '9'
+}
+
+func isLetter(s byte) bool {
+	if s >= 'a' && s <= 'z' {
 		return true
-	}
-	cnt := 0
-	tres := strings.Split(t, "")
-	sres := strings.Split(s, "")
-	for i := 0; i < len(tres); i++ {
-		if sres[cnt] == tres[i] {
-			if cnt == len(sres)-1 {
-				return true
-			}
-			cnt++
-		}
 	}
 	return false
 }
 
+func toLover(s byte) byte {
+	if s >= 'A' && s <= 'Z' {
+		return s + 'a' - 'A'
+	}
+	return s
+}
+
+func isPalindrome(wg *sync.WaitGroup, s string) bool {
+	defer wg.Done()
+	i, j := 0, len(s)-1
+	for i < j {
+		if !(isLetter(toLover(s[i])) || isDigit(toLover(s[i]))) {
+			i++
+			continue
+		} else if !(isLetter(toLover(s[j])) || isDigit(toLover(s[j]))) {
+			j--
+			continue
+		} else if toLover(s[i]) == toLover(s[j]) {
+			i++
+			j--
+			continue
+		}
+		return false
+	}
+	return true
+}
+
+func isPalindromeFaster(wg *sync.WaitGroup, s string) bool {
+	defer wg.Done()
+	i, j := 0, len(s)-1
+	for i < j {
+		for i < j && !(isDigit(s[i]) || isLetter(toLover(s[i]))) {
+			i++
+		}
+		for i < j && !(isDigit(s[j]) || isLetter(toLover(s[j]))) {
+			j--
+		}
+		if toLover(s[i]) != toLover(s[j]) {
+			return false
+		}
+		i++
+		j--
+	}
+	return true
+}
+
 func main() {
-	a := ""
-	b := "a"
-	fmt.Println(isSubsequence(a, b))
+	s := "A man, a plan, a canal: Panama"
+
+	wg := &sync.WaitGroup{}
+	wg.Add(2)
+	start := time.Now()
+	go func() {
+		fmt.Println(isPalindrome(wg, s))
+		fmt.Println(time.Since(start))
+	}()
+	go func() {
+		fmt.Println(isPalindromeFaster(wg, s))
+		fmt.Println(time.Since(start))
+	}()
+	wg.Wait()
+	fmt.Println("Готово!")
 }
