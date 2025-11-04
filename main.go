@@ -1,98 +1,81 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"strings"
 	"sync"
 	"time"
 )
 
-func isDigit(s byte) bool {
-	return s >= '0' && s <= '9'
+type WorkerPool struct {
+	ctx         context.Context
+	numWorkers  int
+	workersFunc func(int) int
+	tasksChan   <-chan int
+	resultChan  chan<- int
 }
 
-func isLetter(s byte) bool {
-	if s >= 'a' && s <= 'z' {
-		return true
+func (w WorkerPool) Start() {
+	wg := &sync.WaitGroup{}
+
+	defer close(w.resultChan)
+
+	for i := 0; i < w.numWorkers; i++ {
+		wg.Add(1)
+		go func(goroutineID int) {
+			for num := range w.tasksChan {
+				fmt.Println("Воркер ", goroutineID, " записал в канал с результатами ", w.workersFunc(num), " при исходном числе ", num)
+				fmt.Print("")
+				w.resultChan <- w.workersFunc(num)
+			}
+			wg.Done()
+		}(i + 1)
 	}
-	return false
+
+	wg.Wait()
+	fmt.Println("Конец w.Start()")
 }
 
-func toLover(s byte) byte {
-	if s >= 'A' && s <= 'Z' {
-		return s + 'a' - 'A'
-	}
-	return s
+func timesTwo(num int) int {
+	return num * 2
 }
 
-func isPalindrome(wg *sync.WaitGroup, s string) bool {
-	defer wg.Done()
-	i, j := 0, len(s)-1
-	for i < j {
-		if !(isLetter(toLover(s[i])) || isDigit(toLover(s[i]))) {
-			i++
-			continue
-		} else if !(isLetter(toLover(s[j])) || isDigit(toLover(s[j]))) {
-			j--
-			continue
-		} else if toLover(s[i]) == toLover(s[j]) {
-			i++
-			j--
-			continue
-		}
-		return false
-	}
-	return true
+func squared(num int) int {
+	return num * num
 }
 
-func isPalindromeFaster(wg *sync.WaitGroup, s string) bool {
-	defer wg.Done()
-	i, j := 0, len(s)-1
-	for i < j {
-		for i < j && !(isDigit(s[i]) || isLetter(toLover(s[i]))) {
-			i++
+func generator() <-chan int {
+	ch := make(chan int)
+	go func() {
+		fmt.Println("Генератор начал работу")
+		for i := 1; i <= 10000; i++ {
+			ch <- i
 		}
-		for i < j && !(isDigit(s[j]) || isLetter(toLover(s[j]))) {
-			j--
-		}
-		if toLover(s[i]) != toLover(s[j]) {
-			return false
-		}
-		i++
-		j--
+		close(ch)
+		fmt.Println("Генератор закончил и закрыл канал")
+	}()
+	return ch
+}
+
+func reader(ch <-chan int) {
+	for i := range ch {
+		fmt.Printf("Прочитано значение %d\n", i)
+		fmt.Print("")
 	}
-	return true
+	fmt.Println("Чтение закончено, канал закрыт")
 }
 
 func main() {
-	base := "A man, a plan, a canal: Panama"
-	var sb strings.Builder
-	for i := 0; i < 100000; i++ {
-		sb.WriteString(base)
-	}
-	s := sb.String()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
-	s += "X"
+	start := time.Now()
+	results := make(chan int)
+	w := WorkerPool{ctx, 100, timesTwo, generator(), results}
 
-	fmt.Printf("Длина строки: %d символов\n", len(s))
+	go w.Start()
 
-	wg := &sync.WaitGroup{}
-	wg.Add(2)
+	reader(results)
 
-	start1 := time.Now()
-	go func() {
-		defer fmt.Printf("Версия 1: %v\n", time.Since(start1))
-		result1 := isPalindrome(wg, s)
-		fmt.Printf("Результат 1: %t\n", result1)
-	}()
-
-	start2 := time.Now()
-	go func() {
-		defer fmt.Printf("Версия 2: %v\n", time.Since(start2))
-		result2 := isPalindromeFaster(wg, s)
-		fmt.Printf("Результат 2: %t\n", result2)
-	}()
-
-	wg.Wait()
-	fmt.Println("Готово!")
+	fmt.Println("Мейн закончился cпустя ", time.Since(start))
 }
