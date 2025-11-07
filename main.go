@@ -5,39 +5,32 @@ import (
 	"sort"
 )
 
-func threeSum(nums []int) [][]int {
-	res := make([][]int, 0, 15)
+func abs(a int) int {
+	if a < 0 {
+		return -a
+	}
+	return a
+}
+
+func threeSumClosest(nums []int, target int) int {
 	sort.Ints(nums)
-	var s int
+	res := nums[0] + nums[1] + nums[2]
+	var sum int
 	for i := 0; i < len(nums)-2; i++ {
 		l, r := i+1, len(nums)-1
-		if i > 0 && nums[i] == nums[i-1] {
-			continue
-		}
 		for l < r {
-			s = nums[l] + nums[r]
-			if s == -nums[i] {
-				res = append(res, []int{nums[i], nums[l], nums[r]})
-				l++
-				r--
-				for l < r && nums[l-1] == nums[l] {
-					l++
-				}
-				for r > l && nums[r+1] == nums[r] {
-					r--
-				}
-			} else if s > -nums[i] {
-				r--
-				for r > l && nums[r+1] == nums[r] {
-					r--
-				}
-			} else {
-				l++
-				for l < r && nums[l-1] == nums[l] {
-					l++
-				}
+			sum = nums[i] + nums[l] + nums[r]
+			if sum-target == 0 {
+				return target
 			}
-
+			if abs(sum-target) < abs(res-target) {
+				res = sum
+			}
+			if sum < target {
+				l++
+			} else {
+				r--
+			}
 		}
 	}
 	return res
@@ -45,5 +38,5 @@ func threeSum(nums []int) [][]int {
 
 func main() {
 	a := []int{-100, 50, 50, 50, 50, 70, 30}
-	fmt.Println(threeSum(a))
+	fmt.Println(threeSumClosest(a, 228))
 }
