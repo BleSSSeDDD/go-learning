@@ -6,13 +6,11 @@ import (
 	"testing"
 )
 
-// Вспомогательная функция для сортировки результата (порядок троек не важен)
 func sortResult(result [][]int) {
 	for _, triple := range result {
 		sort.Ints(triple)
 	}
 	sort.Slice(result, func(i, j int) bool {
-		// Сортируем тройки для стабильного сравнения
 		if result[i][0] != result[j][0] {
 			return result[i][0] < result[j][0]
 		}
