@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type TreeNode struct {
 	Val   int
@@ -8,28 +10,30 @@ type TreeNode struct {
 	Right *TreeNode
 }
 
-func countChildren(node *TreeNode) int {
-	if node == nil {
+/**
+ * Definition for a binary tree node.
+ * type TreeNode struct {
+ *     Val int
+ *     Left *TreeNode
+ *     Right *TreeNode
+ * }
+ */
+func max(a int, b int) int {
+	if a < b {
+		return b
+	}
+	return a
+}
+
+func maxDepth(root *TreeNode) int {
+	if root == nil {
 		return 0
 	}
-	return map[bool]int{true: 1}[node.Left != nil] + map[bool]int{true: 1}[node.Right != nil]
+	maxD := max(maxDepth(root.Left), maxDepth(root.Right))
+	return maxD + 1
 }
 
 func main() {
-	root := &TreeNode{Val: 1, Left: &TreeNode{Val: 2}, Right: &TreeNode{Val: 3, Left: &TreeNode{Val: 4}}}
-
-	fmt.Println(*root, *root.Left, *root.Right)
-
-	fmt.Println("Структура дерева:")
-	fmt.Printf("Корень: %d\n", root.Val)
-	fmt.Printf("Левый ребенок: %d\n", root.Left.Val)
-	fmt.Printf("Правый ребенок: %d\n", root.Right.Val)
-
-	fmt.Printf("\nУзел %d - лист? %t (нет детей)\n", root.Left.Val, root.Left.Left == nil && root.Left.Right == nil)
-	fmt.Printf("Узел %d - лист? %t (нет детей)\n", root.Right.Val, root.Right.Left == nil && root.Right.Right == nil)
-
-	fmt.Println(countChildren(root))
-	fmt.Println(countChildren(root.Left))
-	fmt.Println(countChildren(root.Right))
-
+	root := &TreeNode{Val: 1, Left: &TreeNode{Val: 2}, Right: &TreeNode{Val: 3, Left: &TreeNode{Val: 4, Left: &TreeNode{Val: 4}}}}
+	fmt.Println(maxDepth(root))
 }
