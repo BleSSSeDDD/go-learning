@@ -10,14 +10,16 @@ func searchInsert(nums []int, target int) int {
 		fmt.Println(l, r)
 		if nums[l+(r-l)/2] < target {
 			l = l + (r-l)/2
-		} else {
+		} else if nums[l+(r-l)/2] > target {
 			r = l + (r-l)/2
+		} else {
+			break
 		}
 	}
 	return l
 }
 
 func main() {
-	a := []int{1, 2, 3, 4, 24356}
+	a := []int{1, 2, 3, 3, 3, 4, 24356}
 	fmt.Println(searchInsert(a, 4))
 }
