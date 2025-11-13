@@ -4,22 +4,19 @@ import (
 	"fmt"
 )
 
-func searchInsert(nums []int, target int) int {
-	l, r := 0, len(nums)-1
-	for l < r {
-		fmt.Println(l, r)
-		if nums[l+(r-l)/2] < target {
-			l = l + (r-l)/2
-		} else if nums[l+(r-l)/2] > target {
-			r = l + (r-l)/2
+func removeDuplicates(nums []int) int {
+	k := 1
+	for i := 1; i < len(nums); i++ {
+		if nums[i] != nums[i-1] {
+			k++
 		} else {
-			break
+			nums[k] = nums[i]
 		}
 	}
-	return l
+	return k
 }
 
 func main() {
-	a := []int{1, 2, 3, 3, 3, 4, 24356}
-	fmt.Println(searchInsert(a, 4))
+	a := []int{0, 0, 1, 2, 3, 3, 3, 4, 4, 5, 5, 5, 5, 5, 5, 6, 7}
+	fmt.Println(removeDuplicates(a))
 }
