@@ -2,24 +2,28 @@ package main
 
 import (
 	"fmt"
+	"sort"
 )
 
-func searchInsert(nums []int, target int) int {
-	l, r := 0, len(nums)-1
-	for l < r {
-		fmt.Println(l, r)
-		if nums[l+(r-l)/2] < target {
-			l = l + (r-l)/2
-		} else if nums[l+(r-l)/2] > target {
-			r = l + (r-l)/2
+func countPairs(nums []int, target int) int {
+	var res int
+	sort.Ints(nums)
+	i, j := 0, len(nums)-1
+	for i < j {
+		if nums[i]+nums[j] >= target {
+			j--
 		} else {
-			break
+			res += j - i
+			fmt.Println(i)
+			i++
 		}
 	}
-	return l
+	return res
 }
 
 func main() {
-	a := []int{1, 2, 3, 3, 3, 4, 24356}
-	fmt.Println(searchInsert(a, 4))
+	a := []int{1, 1, 2, 2}
+	fmt.Println(countPairs(a, 4))
 }
+
+(0 1 2 3 4 5 6 7 8)
