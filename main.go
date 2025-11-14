@@ -5,25 +5,21 @@ import (
 	"sort"
 )
 
-func countPairs(nums []int, target int) int {
-	var res int
-	sort.Ints(nums)
-	i, j := 0, len(nums)-1
-	for i < j {
-		if nums[i]+nums[j] >= target {
-			j--
+func removeDuplicates(nums []int) int {
+	k := 1
+	for i := 1; i < len(nums); i++ {
+		if nums[i] != nums[i-1] {
+			k++
 		} else {
-			res += j - i
-			fmt.Println(i)
-			i++
+			nums[k] = nums[i]
 		}
 	}
-	return res
+	return k
 }
 
 func main() {
-	a := []int{1, 1, 2, 2}
-	fmt.Println(countPairs(a, 4))
+	a := []int{0, 0, 1, 2, 3, 3, 3, 4, 4, 5, 5, 5, 5, 5, 5, 6, 7}
+	fmt.Println(removeDuplicates(a))
 }
 
 (0 1 2 3 4 5 6 7 8)
