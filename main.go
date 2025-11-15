@@ -2,24 +2,27 @@ package main
 
 import (
 	"fmt"
-	"sort"
 )
 
-func removeDuplicates(nums []int) int {
-	k := 1
-	for i := 1; i < len(nums); i++ {
-		if nums[i] != nums[i-1] {
+func moveZeroes(nums []int) {
+	k := 0
+	i := 0
+	for i < len(nums)-k {
+		if nums[i] == 0 {
+			for j := i; j < len(nums)-1-k; j++ {
+				nums[j] = nums[j+1]
+				fmt.Println(nums)
+			}
+			nums[len(nums)-1-k] = 0
 			k++
 		} else {
-			nums[k] = nums[i]
+			i++
 		}
 	}
-	return k
 }
 
 func main() {
 	a := []int{0, 0, 1, 2, 3, 3, 3, 4, 4, 5, 5, 5, 5, 5, 5, 6, 7}
-	fmt.Println(removeDuplicates(a))
+	moveZeroes(a)
+	fmt.Println(a)
 }
-
-(0 1 2 3 4 5 6 7 8)
