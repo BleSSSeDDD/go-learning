@@ -4,25 +4,28 @@ import (
 	"fmt"
 )
 
-func moveZeroes(nums []int) {
-	k := 0
-	i := 0
-	for i < len(nums)-k {
-		if nums[i] == 0 {
-			for j := i; j < len(nums)-1-k; j++ {
-				nums[j] = nums[j+1]
-				fmt.Println(nums)
+func isOneBitCharacter(bits []int) bool {
+
+	var i int
+
+	for i < len(bits) {
+		if bits[i] == 0 {
+			if i == len(bits)-1 {
+				return true
 			}
-			nums[len(nums)-1-k] = 0
-			k++
-		} else {
 			i++
+		} else {
+			i += 2
+			if i >= len(bits) {
+				return false
+			}
 		}
 	}
+	return true
 }
 
 func main() {
-	a := []int{0, 0, 1, 2, 3, 3, 3, 4, 4, 5, 5, 5, 5, 5, 5, 6, 7}
-	moveZeroes(a)
-	fmt.Println(a)
+	a := []int{0, 1, 0, 1, 0}
+
+	fmt.Println(isOneBitCharacter(a))
 }
