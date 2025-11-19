@@ -2,30 +2,60 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 )
 
-func isOneBitCharacter(bits []int) bool {
-
-	var i int
-
-	for i < len(bits) {
-		if bits[i] == 0 {
-			if i == len(bits)-1 {
-				return true
+func evalRPN(tokens []string) int {
+	operations := make(map[string]struct{})
+	operations["+"] = struct{}{}
+	operations["-"] = struct{}{}
+	operations["*"] = struct{}{}
+	operations["/"] = struct{}{}
+	s := stack{}
+	for _, str := range tokens {
+		if _, isOp := operations[str]; isOp {
+			if str == "+" {
+				s.push(s.pop() + s.pop())
 			}
-			i++
+			if str == "-" {
+				a := s.pop()
+				b := s.pop()
+				s.push(b - a)
+			}
+			if str == "*" {
+				s.push(s.pop() * s.pop())
+			}
+			if str == "/" {
+				a := s.pop()
+				b := s.pop()
+				s.push(b / a)
+			}
 		} else {
-			i += 2
-			if i >= len(bits) {
-				return false
-			}
+			num, _ := strconv.Atoi(str)
+			s.push(num)
 		}
 	}
-	return true
+
+	return s.pop()
 }
 
-func main() {
-	a := []int{0, 1, 0, 1, 0}
+type stack struct {
+	buf []int
+}
 
-	fmt.Println(isOneBitCharacter(a))
+func (s *stack) pop() int {
+	tmp := s.buf[len(s.buf)-1]
+	s.buf = s.buf[:len(s.buf)-1]
+	fmt.Println("Pop " + strconv.Itoa(tmp))
+	return tmp
+}
+
+func (s *stack) push(a int) {
+	s.buf = append(s.buf, a)
+	fmt.Println("Push " + strconv.Itoa(a))
+}
+func main() {
+	a := []string{"4", "13", "5", "/", "+"}
+	res := evalRPN(a)
+	fmt.Println(res)
 }
