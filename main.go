@@ -3,40 +3,27 @@ package main
 import (
 	"fmt"
 	"strconv"
+	"strings"
 )
 
-func evalRPN(tokens []string) int {
-	operations := make(map[string]struct{})
-	operations["+"] = struct{}{}
-	operations["-"] = struct{}{}
-	operations["*"] = struct{}{}
-	operations["/"] = struct{}{}
+func exclusiveTime(n int, logs []string) []int {
+	res := make([]int, n)
 	s := stack{}
-	for _, str := range tokens {
-		if _, isOp := operations[str]; isOp {
-			if str == "+" {
-				s.push(s.pop() + s.pop())
-			}
-			if str == "-" {
-				a := s.pop()
-				b := s.pop()
-				s.push(b - a)
-			}
-			if str == "*" {
-				s.push(s.pop() * s.pop())
-			}
-			if str == "/" {
-				a := s.pop()
-				b := s.pop()
-				s.push(b / a)
-			}
+
+	for i := 0; i < len(logs); i++ {
+		log := strings.Split(logs[i], ":")
+		tmp, _ := strconv.Atoi(log[2])
+		id, _ := strconv.Atoi(log[0])
+
+		if log[1] == "start" {
+			s.push(tmp)
 		} else {
-			num, _ := strconv.Atoi(str)
-			s.push(num)
+			timeOfFunc := tmp - s.pop()
+			res[id] = timeOfFunc
 		}
 	}
 
-	return s.pop()
+	return res
 }
 
 type stack struct {
@@ -54,8 +41,10 @@ func (s *stack) push(a int) {
 	s.buf = append(s.buf, a)
 	fmt.Println("Push " + strconv.Itoa(a))
 }
+
 func main() {
-	a := []string{"4", "13", "5", "/", "+"}
-	res := evalRPN(a)
+	a := []string{"0:start:0", "1:start:2", "1:end:5", "2:start:6", "2:end:7", "0:end:8"}
+	n := 3
+	res := exclusiveTime(n, a)
 	fmt.Println(res)
 }
