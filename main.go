@@ -5,13 +5,24 @@ import (
 	"sort"
 )
 
+func binsearch(a []int, target int, l int, r int) int {
+	if l > r {
+		return -1
+	}
+
+	mid := l + (r-l)/2
+
+	if a[mid] == target {
+		return mid
+	} else if a[mid] < target {
+		return binsearch(a, target, mid+1, r)
+	}
+
+	return binsearch(a, target, l, mid-1)
+}
+
 func main() {
-	a := [][]int{{20, 30}, {25, 10, 0}, {-10, 20}, {-10, 20}, {-10, 20}}
-	fmt.Println(a)
-
-	sort.Slice(a, func(i, j int) bool {
-		return a[i][0] < a[j][0]
-	})
-
-	fmt.Println(a)
+	a := []int{}
+	sort.Ints(a)
+	fmt.Println(binsearch(a, 228, 0, len(a)-1))
 }
