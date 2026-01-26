@@ -5,66 +5,132 @@ import (
 	"fmt"
 )
 
+func main() {
+
+	fmt.Println("++++++++1 3 2 9 -10 -> -10 1 2 3 9+++++++++++")
+	fmt.Println("+++MaxHeap+++")
+	h := NewMaxHeap[int]()
+
+	h.Append(1)
+	h.Append(3)
+	h.Append(2)
+	h.Append(9)
+	h.Append(-10)
+
+	fmt.Println(h.Pop())
+	fmt.Println(h.Pop())
+	fmt.Println(h.Pop())
+	fmt.Println(h.Pop())
+	fmt.Println(h.Pop())
+
+	fmt.Println("+++MinHeap+++")
+
+	h = NewMinHeap[int]()
+
+	h.Append(1)
+	h.Append(3)
+	h.Append(2)
+	h.Append(9)
+	h.Append(-10)
+
+	fmt.Println(h.Pop())
+	fmt.Println(h.Pop())
+	fmt.Println(h.Pop())
+	fmt.Println(h.Pop())
+	fmt.Println(h.Pop())
+	fmt.Println(h.Pop())
+	fmt.Println(h.Pop())
+	fmt.Println(h.Pop())
+	fmt.Println(h.Pop())
+	fmt.Println(h.Pop())
+	fmt.Println(h.Pop())
+	fmt.Println(h.Pop())
+	fmt.Println(h.Pop())
+	fmt.Println(h.Pop())
+
+	fmt.Println("\n=== СТРЕСС-ТЕСТ MaxHeap ===")
+	h2 := NewMaxHeap[int]()
+	testData := []int{100, -50, 0, 777, 23, -777, 42, 1}
+
+	fmt.Println("Вставляем:", testData)
+	for _, v := range testData {
+		h2.Append(v)
+	}
+
+	fmt.Println("Извлекаем (должно быть по убыванию):")
+	prev := h2.Pop()
+	fmt.Print(prev, " ")
+	for i := 0; i < len(testData)-1; i++ {
+		curr := h2.Pop()
+		fmt.Print(curr, " ")
+		if curr > prev { // В max-heap каждый следующий должен быть меньше предыдущего
+			fmt.Printf("\n⛔ Ошибка порядка! %d > %d\n", curr, prev)
+		}
+		prev = curr
+	}
+	fmt.Println("\n✅ Тест пройден, если нет ошибок выше")
+}
+
 type Heap[T cmp.Ordered] struct {
-	buff  []T
+	data  []T
 	isMin bool
 }
 
 func NewMinHeap[T cmp.Ordered]() *Heap[T] {
-	return &Heap[T]{buff: make([]T, 0), isMin: true}
+	return &Heap[T]{data: make([]T, 0), isMin: true}
 }
 
 func NewMaxHeap[T cmp.Ordered]() *Heap[T] {
-	return &Heap[T]{buff: make([]T, 0), isMin: false}
+	return &Heap[T]{data: make([]T, 0), isMin: false}
 }
 
-// по сути дает ответ на вопрос с кем нам меняться: в случае minHeap возвращает большего, в случае maxHeap меньшего
 func compare[T cmp.Ordered](a, b T, isMin bool) bool {
 	if isMin {
 		return a > b
+	} else {
+		return b > a
 	}
-	return b > a
 }
 
-func size[T cmp.Ordered](h *Heap[T]) int {
-	if h == nil {
-		return 0
-	}
-	return len(h.buff)
-}
-
-func appendToHeap[T cmp.Ordered](h *Heap[T], element T) {
-	h.buff = append(h.buff, element)
+func (h *Heap[T]) Append(newElement T) {
+	h.data = append(h.data, newElement)
 	hippifyUp(h)
 }
 
 func hippifyUp[T cmp.Ordered](h *Heap[T]) {
-	index := len(h.buff) - 1
-	for index > 0 && compare(h.buff[(index-1)/2], h.buff[index], h.isMin) {
-		h.buff[(index-1)/2], h.buff[index] = h.buff[index], h.buff[(index-1)/2]
+	index := len(h.data) - 1
+	for index > 0 && compare(h.data[(index-1)/2], h.data[index], h.isMin) {
+		h.data[index], h.data[(index-1)/2] = h.data[(index-1)/2], h.data[index]
 		index = (index - 1) / 2
 	}
 }
 
-func deleteFromHeap[T cmp.Ordered](h *Heap[T]) {
-	if h == nil || len(h.buff) == 0 {
-		return
+func (h *Heap[T]) Pop() T {
+	if len(h.data) == 0 {
+		var zero T
+		return zero
 	}
-	h.buff[0], h.buff[len(h.buff)-1] = h.buff[len(h.buff)-1], h.buff[0]
-	h.buff = h.buff[0 : len(h.buff)-1]
+
+	res := h.data[0]
+
+	h.data[0], h.data[len(h.data)-1] = h.data[len(h.data)-1], h.data[0]
+	h.data = h.data[0 : len(h.data)-1]
+
 	hippifyDown(h)
+	return res
 }
 
 func hippifyDown[T cmp.Ordered](h *Heap[T]) {
 	index := 0
-
 	for {
 		swapIndex := index
+
 		left, right := index*2+1, index*2+2
-		if left < len(h.buff) && compare(h.buff[index], h.buff[left], h.isMin) {
+
+		if left < len(h.data) && compare(h.data[index], h.data[left], h.isMin) {
 			swapIndex = left
 		}
-		if right < len(h.buff) && compare(h.buff[swapIndex], h.buff[right], h.isMin) {
+		if right < len(h.data) && compare(h.data[swapIndex], h.data[right], h.isMin) {
 			swapIndex = right
 		}
 
@@ -72,87 +138,7 @@ func hippifyDown[T cmp.Ordered](h *Heap[T]) {
 			break
 		}
 
-		h.buff[index], h.buff[swapIndex] = h.buff[swapIndex], h.buff[index]
+		h.data[index], h.data[swapIndex] = h.data[swapIndex], h.data[index]
 		index = swapIndex
 	}
-}
-
-func peek[T cmp.Ordered](h *Heap[T]) T {
-	if h == nil || len(h.buff) == 0 {
-		var zero T
-		return zero
-	}
-	return h.buff[0]
-}
-
-func pop[T cmp.Ordered](h *Heap[T]) T {
-	if h == nil || len(h.buff) == 0 {
-		var zero T
-		return zero
-	}
-	res := h.buff[0]
-	deleteFromHeap(h)
-	return res
-}
-
-func main() {
-	// --- Тест Min-Heap ---
-	fmt.Println("=== Min-Heap Test ===")
-	minHeap := NewMinHeap[int]()
-
-	fmt.Println("Добавляем элементы: 5, 3, 8, 1, 6")
-	appendToHeap(minHeap, 5)
-	appendToHeap(minHeap, 3)
-	appendToHeap(minHeap, 8)
-	appendToHeap(minHeap, 1)
-	appendToHeap(minHeap, 6)
-
-	fmt.Println("Размер кучи:", size(minHeap))
-	fmt.Println("Peek:", peek(minHeap))
-
-	fmt.Println("Pop элементы:")
-	for size(minHeap) > 0 {
-		fmt.Println(pop(minHeap))
-	}
-
-	// --- Тест Max-Heap ---
-	fmt.Println("\n=== Max-Heap Test ===")
-	maxHeap := NewMaxHeap[int]()
-
-	fmt.Println("Добавляем элементы: 5, 3, 8, 1, 6")
-	appendToHeap(maxHeap, 5)
-	appendToHeap(maxHeap, 3)
-	appendToHeap(maxHeap, 8)
-	appendToHeap(maxHeap, 1)
-	appendToHeap(maxHeap, 6)
-
-	fmt.Println("Размер кучи:", size(maxHeap))
-	fmt.Println("Peek:", peek(maxHeap))
-
-	fmt.Println("Pop элементы:")
-	for size(maxHeap) > 0 {
-		fmt.Println(pop(maxHeap))
-	}
-
-	fmt.Println("\n=== Max-Heap Stress Test (случайные данные) ===")
-	stressHeap := NewMaxHeap[int]()
-	testData := []int{100, -5, 42, 777, 0, 23, -100, 500, 1, 1, 1, 999}
-
-	fmt.Println("Вставляем в порядке:", testData)
-	for _, v := range testData {
-		appendToHeap(stressHeap, v)
-	}
-
-	fmt.Println("Извлекаем всё (должно быть по убыванию):")
-	prev := peek(stressHeap)
-	for size(stressHeap) > 0 {
-		curr := pop(stressHeap)
-		fmt.Printf("%d ", curr)
-		// Проверка свойства max-heap: каждый следующий извлечённый должен быть <= предыдущего
-		if curr > prev {
-			fmt.Printf("\n⛔ ОШИБКА: нарушение порядка! %d > %d\n", curr, prev)
-		}
-		prev = curr
-	}
-	fmt.Println("\n✅ Стресс-тест пройден, если выше нет ошибок.")
 }
